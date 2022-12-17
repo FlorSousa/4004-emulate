@@ -1,6 +1,6 @@
 public class Block {
     String codeBlock;
-    byte decimalCodeBlock;
+    Short decimalCodeBlock;
 
     Block(String codeBlock){
         this.codeBlock = codeBlock;
@@ -8,7 +8,7 @@ public class Block {
     }
 
     public void decimalCodeBlock(){
-        this.decimalCodeBlock = Byte.parseByte(this.codeBlock, 16);
+        this.decimalCodeBlock = Short.parseShort(this.codeBlock, 16);
     }
 
     public int getDecimalCodeBlock(){

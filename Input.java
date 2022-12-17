@@ -1,7 +1,7 @@
 import java.util.Scanner;
 public class Input {
     Scanner scanner;
-    final byte maxValueAcceptRange = 19;
+    final short maxValueAcceptRange = 259;
 
     public void setCommand() throws ImpossibleToConvert{
         this.scanner = new Scanner(System.in);
@@ -12,7 +12,7 @@ public class Input {
 
     public boolean verifyCommand(Block command) throws ImpossibleToConvert{
         try{
-            return command.getDecimalCodeBlock() < 19 ? true : false;
+            return command.getDecimalCodeBlock() < this.maxValueAcceptRange ? true : false;
         }catch(Exception e){
             throw new ImpossibleToConvert("The block is not a hexadecimal code");
         }
