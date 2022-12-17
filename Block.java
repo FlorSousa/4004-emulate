@@ -1,14 +1,18 @@
 public class Block {
     String codeBlock;
-    Short decimalCodeBlock;
+    Byte decimalCodeBlock;
 
-    Block(String codeBlock){
+    Block(String codeBlock) throws ImpossibleToConvert{
         this.codeBlock = codeBlock;
         this.decimalCodeBlock();
     }
 
-    public void decimalCodeBlock(){
-        this.decimalCodeBlock = Short.parseShort(this.codeBlock, 16);
+    public void decimalCodeBlock() throws ImpossibleToConvert{
+        try{
+            this.decimalCodeBlock = Byte.parseByte(this.codeBlock, 16);
+        }catch(Exception e){
+            throw new ImpossibleToConvert("Overflow");
+        }
     }
 
     public int getDecimalCodeBlock(){
