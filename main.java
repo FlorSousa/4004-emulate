@@ -5,5 +5,6 @@ public class main {
         Input entrada = new Input();
         entrada.setCommand();
         List<Block> CommandList = entrada.getCodeBlocks();
+        Conversor conversor =  new Conversor(CommandList);
     }
 }
