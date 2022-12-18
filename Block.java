@@ -35,11 +35,15 @@ public class Block {
         }
     }
 
-    public int getDecimalCodeBlock(){
+    public Short getDecimalCodeBlock(){
         return this.decimalCodeBlock;
     }
 
     public String getCodeBlock(){
         return this.codeBlock;
+    }
+
+    public String getAssociatedValue(){
+        return this.AssociatadedValue;
     }
 }
