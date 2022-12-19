@@ -68,11 +68,11 @@ public class Emulator {
 
     public void RegisterUpdate() throws SomethingGotWrong {
         try {
-            this.Stack[4] = this.getBlockFromRom();
-            this.RomPointer++;
             for (int i = 0; i < 3; i++) {
                 this.Stack[i] = this.Stack[i + 1];
             }
+            this.Stack[4] = this.getBlockFromRom();
+            this.RomPointer++;
         } catch (Exception e) {
             throw new SomethingGotWrong("Something got wrong during register update");
         }
