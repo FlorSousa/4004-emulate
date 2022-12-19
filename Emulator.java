@@ -85,9 +85,15 @@ public class Emulator {
     public void ExecuteOperation() throws Exception {
         Block ActualInstruction = this.Stack[this.StackPointer];
         String Mnemonic = this.TransformOperation(ActualInstruction);
-        this.MnemonicsTable.get(Mnemonic).run();
-        this.StackPointer++;
-        this.RegisterUpdate();
+        Runnable RunMethod = this.MnemonicsTable.get(Mnemonic);
+        if(RunMethod != null){
+            RunMethod.run();
+            this.StackPointer++;
+            this.RegisterUpdate();
+        }else{
+            throw new ImpossibleToRun("Cannot RUN the block");
+        }
+        
     }
 
     public Block getBlockFromRom() {
