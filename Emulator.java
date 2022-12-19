@@ -1,3 +1,6 @@
+import java.util.HashMap;
+import java.util.Map;
+
 public class Emulator {
     private byte[][] P0 = new byte[1][1];
     private byte[][] P1 = new byte[1][1];
@@ -14,8 +17,38 @@ public class Emulator {
     private byte Accumulator = 0;
     private boolean carry = false;
 
+    private Map<String,Runnable> Commands;
     Emulator(){
-        
+        Commands = new HashMap<>();
+        Commands.put("NOP", () -> this.NOP());
+        Commands.put("JCN", () -> this.JCN());
+        Commands.put("FIM", () -> this.FIM());
+        Commands.put("FIN", () -> this.FIN());
+        Commands.put("JIN", () -> this.JIN());
+        Commands.put("JUN", () -> this.JUN());
+        Commands.put("JMS", () -> this.JMS());
+        Commands.put("INC", () -> this.INC());
+        Commands.put("ISZ", () -> this.ISZ());
+        Commands.put("ADD", () -> this.ADD());
+        Commands.put("SUB", () -> this.SUB());
+        Commands.put("LD",  () -> this.LD());
+        Commands.put("XCH", () -> this.XCH());
+        Commands.put("BBL", () -> this.BBL());
+        Commands.put("LDM", () -> this.LDM());
+        Commands.put("CLB", () -> this.CLB());
+        Commands.put("CLC", () -> this.CLC());
+        Commands.put("IAC", () -> this.IAC());
+        Commands.put("CMC", () -> this.CMC());
+        Commands.put("CMA", () -> this.CMA());
+        Commands.put("RAL", () -> this.RAL());
+        Commands.put("RAR", () -> this.RAR());
+        Commands.put("TCC", () -> this.TCC());
+        Commands.put("DAC", () -> this.DAC());
+        Commands.put("TCS", () -> this.TCS());
+        Commands.put("STC", () -> this.STC());
+        Commands.put("DAA", () -> this.DAA());
+        Commands.put("KBP", () -> this.KBP());
+        Commands.put("DCL", () -> this.DCL());
     }
 
     public void NOP(){
