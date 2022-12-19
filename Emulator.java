@@ -12,9 +12,7 @@ public class Emulator {
     private byte[][] P7 = new byte[1][1];
 
     private Block[] Stack = new Block[4];
-    private byte StackPointer = 0;
 
-    private Block ActualBlock;
     private byte RomPointer = 0;
     private byte Accumulator = 0;
     private boolean carry = false;
@@ -68,10 +66,10 @@ public class Emulator {
 
     public void RegisterUpdate() throws SomethingGotWrong {
         try {
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < 1; i++) {
                 this.Stack[i] = this.Stack[i + 1];
             }
-            this.Stack[4] = this.getBlockFromRom();
+            this.Stack[3] = this.getBlockFromRom();
             this.RomPointer++;
         } catch (Exception e) {
             throw new SomethingGotWrong("Something got wrong during register update");
@@ -83,12 +81,11 @@ public class Emulator {
     }
 
     public void ExecuteOperation() throws Exception {
-        Block ActualInstruction = this.Stack[this.StackPointer];
+        Block ActualInstruction = this.Stack[0];
         String Mnemonic = this.TransformOperation(ActualInstruction);
         Runnable RunMethod = this.MnemonicsTable.get(Mnemonic);
         if(RunMethod != null){
             RunMethod.run();
-            this.StackPointer++;
             this.RegisterUpdate();
         }else{
             throw new ImpossibleToRun("Cannot RUN the block");
