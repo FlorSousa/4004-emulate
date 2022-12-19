@@ -10,7 +10,7 @@ public class Emulator {
     private byte[][] P5 = new byte[1][1];
     private byte[][] P6 = new byte[1][1];
     private byte[][] P7 = new byte[1][1];
-    
+
     private Block[] Stack = new Block[4];
     private byte StackPointer = 0;
 
@@ -18,188 +18,197 @@ public class Emulator {
     private byte RomPointer = 0;
     private byte Accumulator = 0;
     private boolean carry = false;
-    private Map<String,Runnable> Commands;
+    private Map<String, Runnable> MnemonicsTable;
 
     private DataRom ROM;
     private Conversor conversor;
-    Emulator(DataRom ROM){
+
+    Emulator(DataRom ROM) {
         this.ROM = ROM;
-        Commands = new HashMap<>();
+        MnemonicsTable = new HashMap<>();
         this.conversor = new Conversor();
-        Commands.put("NOP", () -> this.NOP());
-        Commands.put("JCN", () -> this.JCN());
-        Commands.put("FIM", () -> this.FIM());
-        Commands.put("FIN", () -> this.FIN());
-        Commands.put("JIN", () -> this.JIN());
-        Commands.put("JUN", () -> this.JUN());
-        Commands.put("JMS", () -> this.JMS());
-        Commands.put("INC", () -> this.INC());
-        Commands.put("ISZ", () -> this.ISZ());
-        Commands.put("ADD", () -> this.ADD());
-        Commands.put("SUB", () -> this.SUB());
-        Commands.put("XCH", () -> this.XCH());
-        Commands.put("BBL", () -> this.BBL());
-        Commands.put("LDM", () -> this.LDM());
-        Commands.put("CLB", () -> this.CLB());
-        Commands.put("CLC", () -> this.CLC());
-        Commands.put("IAC", () -> this.IAC());
-        Commands.put("CMC", () -> this.CMC());
-        Commands.put("CMA", () -> this.CMA());
-        Commands.put("RAL", () -> this.RAL());
-        Commands.put("RAR", () -> this.RAR());
-        Commands.put("TCC", () -> this.TCC());
-        Commands.put("DAC", () -> this.DAC());
-        Commands.put("TCS", () -> this.TCS());
-        Commands.put("STC", () -> this.STC());
-        Commands.put("DAA", () -> this.DAA());
-        Commands.put("KBP", () -> this.KBP());
-        Commands.put("DCL", () -> this.DCL());
-        Commands.put("LD",  () -> this.LD());
+        MnemonicsTable.put("NOP", () -> this.NOP());
+        MnemonicsTable.put("JCN", () -> this.JCN());
+        MnemonicsTable.put("FIM", () -> this.FIM());
+        MnemonicsTable.put("FIN", () -> this.FIN());
+        MnemonicsTable.put("JIN", () -> this.JIN());
+        MnemonicsTable.put("JUN", () -> this.JUN());
+        MnemonicsTable.put("JMS", () -> this.JMS());
+        MnemonicsTable.put("INC", () -> this.INC());
+        MnemonicsTable.put("ISZ", () -> this.ISZ());
+        MnemonicsTable.put("ADD", () -> this.ADD());
+        MnemonicsTable.put("SUB", () -> this.SUB());
+        MnemonicsTable.put("XCH", () -> this.XCH());
+        MnemonicsTable.put("BBL", () -> this.BBL());
+        MnemonicsTable.put("LDM", () -> this.LDM());
+        MnemonicsTable.put("CLB", () -> this.CLB());
+        MnemonicsTable.put("CLC", () -> this.CLC());
+        MnemonicsTable.put("IAC", () -> this.IAC());
+        MnemonicsTable.put("CMC", () -> this.CMC());
+        MnemonicsTable.put("CMA", () -> this.CMA());
+        MnemonicsTable.put("RAL", () -> this.RAL());
+        MnemonicsTable.put("RAR", () -> this.RAR());
+        MnemonicsTable.put("TCC", () -> this.TCC());
+        MnemonicsTable.put("DAC", () -> this.DAC());
+        MnemonicsTable.put("TCS", () -> this.TCS());
+        MnemonicsTable.put("STC", () -> this.STC());
+        MnemonicsTable.put("DAA", () -> this.DAA());
+        MnemonicsTable.put("KBP", () -> this.KBP());
+        MnemonicsTable.put("DCL", () -> this.DCL());
+        MnemonicsTable.put("LD", () -> this.LD());
         this.RegisterSetup();
     }
 
-    public void RegisterSetup(){
-        for(int i=0;i<4;i++){
+    public void RegisterSetup() {
+        for (int i = 0; i < 4; i++) {
             this.Stack[i] = this.getBlockFromRom();
             this.RomPointer++;
         }
     }
 
-    public void RegisterUpdate() throws SomethingGotWrong{
-        try{
+    public void RegisterUpdate() throws SomethingGotWrong {
+        try {
             this.Stack[4] = this.getBlockFromRom();
-            for(int i=0;i<3;i++){
-                this.Stack[i] = this.Stack[i+1];
+            this.RomPointer++;
+            for (int i = 0; i < 3; i++) {
+                this.Stack[i] = this.Stack[i + 1];
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             throw new SomethingGotWrong("Something got wrong during register update");
         }
-        
     }
 
-    public void TransformOperation(){
-    
+    public String TransformOperation(Block InstructionToConvert) throws Exception {
+        return this.conversor.ConvertOperation(InstructionToConvert);
     }
 
-    public Block getBlockFromRom(){
+    public void ExecuteOperation() throws Exception {
+        Block ActualInstruction = this.Stack[this.StackPointer];
+        String Mnemonic = this.TransformOperation(ActualInstruction);
+        this.MnemonicsTable.get(Mnemonic).run();
+        this.StackPointer++;
+        this.RegisterUpdate();
+    }
+
+    public Block getBlockFromRom() {
         return this.ROM.ReturnBlock(this.RomPointer);
     }
 
-    public void NOP(){
+    public void NOP() {
         System.out.println("No Operation - NOP");
     }
 
-    public void JCN(){
+    public void JCN() {
         System.out.println("JUMP to ROM address");
-    }   
+    }
 
-    public void FIM(){
+    public void FIM() {
 
     }
 
-    public void FIN(){
+    public void FIN() {
 
     }
 
-    public void JIN(){
+    public void JIN() {
 
     }
 
-    public void JUN(){
+    public void JUN() {
 
     }
 
-    public void JMS(){
+    public void JMS() {
 
     }
 
-    public void INC(){
+    public void INC() {
         System.out.println("Increment register of register");
 
     }
 
-    public void ISZ(){
+    public void ISZ() {
 
     }
 
-    public void ADD(){
+    public void ADD() {
         System.out.println("ADD contents of register to accumulador with a carry");
 
     }
 
-    public void SUB(){
+    public void SUB() {
 
     }
 
-    public void LD(){
+    public void LD() {
 
     }
 
-    public void XCH(){
+    public void XCH() {
 
     }
 
-    public void BBL(){
+    public void BBL() {
 
     }
 
-    public void LDM(){
+    public void LDM() {
 
     }
 
-    public void CLB(){
+    public void CLB() {
 
     }
 
-    public void CLC(){
+    public void CLC() {
 
     }
 
-    public void IAC(){
-        
-    }
-
-    public void CMC(){
+    public void IAC() {
 
     }
 
-    public void CMA(){
+    public void CMC() {
 
     }
 
-    public void RAL(){
+    public void CMA() {
 
     }
 
-    public void RAR(){
+    public void RAL() {
 
     }
 
-    public void TCC(){
+    public void RAR() {
 
     }
 
-    public void DAC(){
+    public void TCC() {
 
     }
 
-    public void TCS(){
-        
-    }
-
-    public void STC(){
-
-    }
-    
-    public void DAA(){
+    public void DAC() {
 
     }
 
-    public void KBP(){
+    public void TCS() {
 
     }
 
-    public void DCL(){
+    public void STC() {
+
+    }
+
+    public void DAA() {
+
+    }
+
+    public void KBP() {
+
+    }
+
+    public void DCL() {
 
     }
 }
