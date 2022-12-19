@@ -16,7 +16,6 @@ public class Emulator {
 
     private byte Accumulator = 0;
     private boolean carry = false;
-
     private Map<String,Runnable> Commands;
     Emulator(){
         Commands = new HashMap<>();
@@ -31,7 +30,6 @@ public class Emulator {
         Commands.put("ISZ", () -> this.ISZ());
         Commands.put("ADD", () -> this.ADD());
         Commands.put("SUB", () -> this.SUB());
-        Commands.put("LD",  () -> this.LD());
         Commands.put("XCH", () -> this.XCH());
         Commands.put("BBL", () -> this.BBL());
         Commands.put("LDM", () -> this.LDM());
@@ -49,8 +47,11 @@ public class Emulator {
         Commands.put("DAA", () -> this.DAA());
         Commands.put("KBP", () -> this.KBP());
         Commands.put("DCL", () -> this.DCL());
+        Commands.put("LD",  () -> this.LD());
     }
+    public void TransformOperation(){
 
+    }
     public void NOP(){
         System.out.println("No Operation - NOP");
     }
