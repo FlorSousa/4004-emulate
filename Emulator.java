@@ -11,14 +11,21 @@ public class Emulator {
     private byte[][] P6 = new byte[1][1];
     private byte[][] P7 = new byte[1][1];
     
-    private byte[] Stack = new byte[4];
+    private Block[] Stack = new Block[4];
     private byte StackPointer = 0;
 
+    private Block ActualBlock;
+    private byte RomPointer = 0;
     private byte Accumulator = 0;
     private boolean carry = false;
     private Map<String,Runnable> Commands;
-    Emulator(){
+
+    private DataRom ROM;
+    private Conversor conversor;
+    Emulator(DataRom ROM){
+        this.ROM = ROM;
         Commands = new HashMap<>();
+        this.conversor = new Conversor();
         Commands.put("NOP", () -> this.NOP());
         Commands.put("JCN", () -> this.JCN());
         Commands.put("FIM", () -> this.FIM());
@@ -48,17 +55,43 @@ public class Emulator {
         Commands.put("KBP", () -> this.KBP());
         Commands.put("DCL", () -> this.DCL());
         Commands.put("LD",  () -> this.LD());
+        this.RegisterSetup();
     }
-    public void TransformOperation(){
 
+    public void RegisterSetup(){
+        for(int i=0;i<4;i++){
+            this.Stack[i] = this.getBlockFromRom();
+            this.RomPointer++;
+        }
     }
+
+    public void RegisterUpdate() throws SomethingGotWrong{
+        try{
+            this.Stack[4] = this.getBlockFromRom();
+            for(int i=0;i<3;i++){
+                this.Stack[i] = this.Stack[i+1];
+            }
+        }catch(Exception e){
+            throw new SomethingGotWrong("Something got wrong during register update");
+        }
+        
+    }
+
+    public void TransformOperation(){
+    
+    }
+
+    public Block getBlockFromRom(){
+        return this.ROM.ReturnBlock(this.RomPointer);
+    }
+
     public void NOP(){
         System.out.println("No Operation - NOP");
     }
 
     public void JCN(){
         System.out.println("JUMP to ROM address");
-    }
+    }   
 
     public void FIM(){
 
