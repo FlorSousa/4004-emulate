@@ -6,12 +6,8 @@ public class DataRom {
         this.ROM = ROM;
     }
 
-    public Block ReturnBlock(byte pointer) throws IndexOutOfBoundsException{
-         Block block = this.ROM.get(pointer);
-         if(block !=null){
-            return block;
-         }
-         throw new IndexOutOfBoundsException("Pointer is out of limit");
+    public Block ReturnBlock(byte pointer){
+        return pointer <= this.ROM.size()-1 ? this.ROM.get(pointer) : null;
     }
     
 }

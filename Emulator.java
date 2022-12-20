@@ -58,7 +58,7 @@ public class Emulator {
     }
 
     public void RegisterSetup() {
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < this.Stack.length; i++) {
             this.Stack[i] = this.getBlockFromRom();
             this.RomPointer++;
         }
@@ -67,6 +67,7 @@ public class Emulator {
     public void RegisterUpdate() throws SomethingGotWrong {
         try {
             for (int i = 0; i < 1; i++) {
+                System.out.println(i);
                 this.Stack[i] = this.Stack[i + 1];
             }
             this.Stack[3] = this.getBlockFromRom();
