@@ -1,10 +1,5 @@
-import java.util.List;
-
 public class Conversor { 
-    Conversor(){
 
-    }
-    
     public String ConvertOperation(Block InstructionToConvert) throws ImpossibleToConvert{
         try{
             //something
