@@ -2,16 +2,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Emulator {
-    private byte[][] P0 = new byte[1][1];
-    private byte[][] P1 = new byte[1][1];
-    private byte[][] P2 = new byte[1][1];
-    private byte[][] P3 = new byte[1][1];
-    private byte[][] P4 = new byte[1][1];
-    private byte[][] P5 = new byte[1][1];
-    private byte[][] P6 = new byte[1][1];
-    private byte[][] P7 = new byte[1][1];
-    private Block[] Stack = new Block[4];
+    private byte[][] P0 = new byte[2][1];
+    private byte[][] P1 = new byte[2][1];
+    private byte[][] P2 = new byte[2][1];
+    private byte[][] P3 = new byte[2][1];
+    private byte[][] P4 = new byte[2][1];
+    private byte[][] P5 = new byte[2][1];
+    private byte[][] P6 = new byte[2][1];
+    private byte[][] P7 = new byte[2][1];
     private Byte[] registerStack = new Byte[8];
+
+    private Block[] Stack = new Block[4];
     private byte RomPointer = 0;
     private byte Accumulator = 0;
     private boolean carry = false;
@@ -119,36 +120,36 @@ public class Emulator {
             switch (RegisterPair) {
                 case 0:
                     this.P0[0][0] = v1;
-                    this.P0[0][1] = v2;
+                    this.P0[1][0] = v2;
                     break;
                 case 1:
                     this.P1[0][0] = v1;
-                    this.P1[0][1] = v2;
+                    this.P1[1][0] = v2;
                     break;
                 case 2:
                     this.P2[0][0] = v1;
-                    this.P2[0][1] = v2;
+                    this.P2[1][0] = v2;
                     break;
                 case 3:
                     this.P3[0][0] = v1;
-                    this.P3[0][1] = v2;
+                    this.P3[1][0] = v2;
                     break;
                 case 4:
                     this.P4[0][0] = v1;
-                    this.P4[0][1] = v2;
+                    this.P4[1][0] = v2;
                     break;
                 case 5:
                     this.P5[0][0] = v1;
-                    this.P5[0][1] = v2;
+                    this.P5[1][0] = v2;
                     break;
 
                 case 6:
                     this.P6[0][0] = v1;
-                    this.P6[0][1] = v2;
+                    this.P6[1][0] = v2;
                     break;
                 case 7:
                     this.P7[0][0] = v1;
-                    this.P7[0][1] = v2;
+                    this.P7[1][0] = v2;
                     break;
             }
 
