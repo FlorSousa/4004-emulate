@@ -1,49 +1,32 @@
 public class Block {
-    String codeBlock;
-    Short decimalCodeBlock;
-    String AssociatadedValue;
-    Short AssociatedValueShort;
+    String First4Bits;
+    String Second4Bits;
+    String Value;
     
-    Block(String codeBlock) throws ImpossibleToConvert{
-        this.codeBlock = codeBlock;
-        this.decimalCodeBlock();
+    Block(String First4Bit, String Second4Bit ) throws ImpossibleToConvert{
+        this.First4Bits = First4Bit;
+        this.Second4Bits = Second4Bit;
     }
 
-    Block(String codeBlock, String AssociatadedValue) throws ImpossibleToConvert{
-        this.codeBlock = codeBlock;
-        this.AssociatadedValue = AssociatadedValue;
-        this.decimalCodeBlock();
+    Block(String First4Bit, String Second4Bit, String Value ) throws ImpossibleToConvert{
+        this.First4Bits = First4Bit;
+        this.Second4Bits = Second4Bit;
+        this.Value = Value;
     }
-    
+
+    public byte getFirst4Bits(){
+        return Byte.parseByte(First4Bits);
+    }
+
+    public byte getLast4Bits(){
+        return Byte.parseByte(Second4Bits);
+    }
+
     public boolean hasAssociatedValue(){
-        return this.AssociatadedValue != null ? true : false;
+        return this.Value != null ? true : false;
     }
 
-    public void decimalCodeBlock() throws ImpossibleToConvert{
-        try{
-            this.decimalCodeBlock = Short.parseShort(this.codeBlock, 16);
-        }catch(Exception e){
-            throw new ImpossibleToConvert("Overflow");
-        }
-    }
-
-    public void decimalAssociatadedValue() throws ImpossibleToConvert{
-        try{
-            this.AssociatedValueShort = Short.parseShort(this.AssociatadedValue,16);
-        }catch(Exception e){
-            throw new ImpossibleToConvert("Overflow");
-        }
-    }
-
-    public Short getDecimalCodeBlock(){
-        return this.decimalCodeBlock;
-    }
-
-    public String getCodeBlock(){
-        return this.codeBlock;
-    }
-
-    public String getAssociatedValue(){
-        return this.AssociatadedValue;
+    public byte getAssociatedValue(){
+        return Byte.parseByte(this.Value);
     }
 }

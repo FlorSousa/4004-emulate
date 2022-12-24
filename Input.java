@@ -4,7 +4,6 @@ import java.util.Scanner;
 
 public class Input {
     Scanner scanner;
-    final short maxValueAcceptRange = 259;
     boolean recvCode = true;
     List<Block> CodeBlocks = new ArrayList<>();
 
@@ -16,9 +15,10 @@ public class Input {
                 if (line.isBlank() || line.equals("go") || line.equals("GO")) {
                     break;
                 } else {
-                    String[] returnString = haveAssociateValue(line);
-                    Block NewCommandBlock = returnString[1] != null ? createNewBlock(returnString[0], returnString[1])
-                            : createNewBlock(returnString[0]);
+                    String[] returnString = SplitLine(line);
+
+                    Block NewCommandBlock = returnString[2] != null ? createNewBlock(returnString[0], returnString[1], returnString[2])
+                            : createNewBlock(returnString[0], returnString[1]);
                     if (this.verifyCommand(NewCommandBlock))
                         this.CodeBlocks.add(NewCommandBlock);
                 }
@@ -29,17 +29,17 @@ public class Input {
         }
     };
 
-    public Block createNewBlock(String command) throws ImpossibleToConvert {
+    public Block createNewBlock(String First4Bits, String Second4Bits) throws ImpossibleToConvert {
         try {
-            return new Block(command);
+            return new Block(First4Bits,Second4Bits);
         } catch (Exception e) {
             throw new ImpossibleToConvert("The block is not a hexadecimal code");
         }
     }
 
-    public Block createNewBlock(String command, String value) throws ImpossibleToConvert {
+    public Block createNewBlock(String First4Bits, String Second4Bits, String value) throws ImpossibleToConvert {
         try {
-            return new Block(command, value);
+            return new Block(First4Bits, Second4Bits, value);
         } catch (Exception e) {
             throw new ImpossibleToConvert("The block is not a hexadecimal code");
         }
@@ -47,9 +47,9 @@ public class Input {
 
     public boolean verifyCommand(Block command) throws ImpossibleToConvert {
         try {
-            return command.getDecimalCodeBlock() < this.maxValueAcceptRange ? true : false;
+            return (command.getFirst4Bits()<=15 && command.getLast4Bits()<=15);
         } catch (Exception e) {
-            throw new ImpossibleToConvert("The block is not a hexadecimal code");
+            throw new ImpossibleToConvert("The object code are wrong!");
         }
     }
 
@@ -57,19 +57,28 @@ public class Input {
         return this.CodeBlocks;
     }
 
-    public String[] haveAssociateValue(String line) {
-        String cmd;
+    public String[] SplitLine(String line) {
+        String FirstWord;
+        String SecondWord;
         String Value;
-        String[] rtn = new String[2];
+        String[] rtn = new String[3];
         try {
-            cmd = line.split(" ")[0];
-            Value = line.split(" ")[1];
-            rtn[0] = cmd;
-            rtn[1] = Value;
-        } catch (Exception e) {
-            rtn[0] = line.split(" ")[0];
-            rtn[1] = null;
+            if(line.contains(" ")){
+                FirstWord = (line.split(" ")[0]).split("")[0];
+                SecondWord = (line.split(" ")[0]).split("")[1];
+                Value = line.split(" ")[1];
+                rtn[0] = FirstWord;
+                rtn[1] = SecondWord;
+                rtn[2] = Value;
+            }else{
+                FirstWord = (line.split(" ")[0]).split("")[0];
+                SecondWord = (line.split(" ")[0]).split("")[1];
+                rtn[0] = FirstWord;
+                rtn[1] = SecondWord;
+            }
+            return rtn;
+        } catch (IndexOutOfBoundsException e) {
+            throw new IndexOutOfBoundsException();
         }
-        return rtn;
     }
 }
