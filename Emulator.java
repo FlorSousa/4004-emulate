@@ -133,42 +133,10 @@ public class Emulator {
         if (instruction.hasAssociatedValue()) {
             byte v1 = Byte.parseByte(instruction.getAssociatedValue().split("")[0], 16);
             byte v2 = Byte.parseByte(instruction.getAssociatedValue().split("")[1], 16);
-            int RegisterPair = (instruction.getLast4Bits()) / 2;
-            switch (RegisterPair) {
-                case 0:
-                    this.P0[0][0] = v1;
-                    this.P0[1][0] = v2;
-                    break;
-                case 1:
-                    this.P1[0][0] = v1;
-                    this.P1[1][0] = v2;
-                    break;
-                case 2:
-                    this.P2[0][0] = v1;
-                    this.P2[1][0] = v2;
-                    break;
-                case 3:
-                    this.P3[0][0] = v1;
-                    this.P3[1][0] = v2;
-                    break;
-                case 4:
-                    this.P4[0][0] = v1;
-                    this.P4[1][0] = v2;
-                    break;
-                case 5:
-                    this.P5[0][0] = v1;
-                    this.P5[1][0] = v2;
-                    break;
-
-                case 6:
-                    this.P6[0][0] = v1;
-                    this.P6[1][0] = v2;
-                    break;
-                case 7:
-                    this.P7[0][0] = v1;
-                    this.P7[1][0] = v2;
-                    break;
-            }
+            int registerId = (instruction.getLast4Bits()) / 2;
+            byte[][] registerPair = this.registerMap.get(registerId);
+            registerPair[0][0] = v1;
+            registerPair[1][0] = v2;
 
         } else {
             throw new SomethingGotWrong("You are trying use: FIM. But without a value");
@@ -213,8 +181,8 @@ public class Emulator {
         try {
             Block instruction = this.Stack[0];
             System.out.println(this.Accumulator);
-            int registerPair = instruction.getLast4Bits()/2;
-            this.Accumulator = (byte) (registerPair%2==0 ? this.Accumulator+this.registerMap.get(registerPair)[0][0] : this.Accumulator+this.registerMap.get(registerPair)[1][0]);
+            int registerId = instruction.getLast4Bits();
+            this.Accumulator = (byte) (registerId%2==0 ? this.Accumulator+this.registerMap.get(registerId/2)[0][0] : this.Accumulator+this.registerMap.get(registerId)[1][0]);
             System.out.println(this.Accumulator);
         } catch (Exception e) {
             throw e;
