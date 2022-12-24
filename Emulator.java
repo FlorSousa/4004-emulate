@@ -10,20 +10,31 @@ public class Emulator {
     private byte[][] P5 = new byte[2][1];
     private byte[][] P6 = new byte[2][1];
     private byte[][] P7 = new byte[2][1];
-    private Byte[] registerStack = new Byte[8];
 
     private Block[] Stack = new Block[4];
     private byte RomPointer = 0;
     private byte Accumulator = 0;
     private boolean carry = false;
     private Map<String, Runnable> MnemonicsTable;
+    private Map<Integer, byte[][]> registerMap;
     private DataRom ROM;
     private Conversor conversor;
 
     Emulator(DataRom ROM) {
         this.ROM = ROM;
+        registerMap =  new HashMap<>();
         MnemonicsTable = new HashMap<>();
         this.conversor = new Conversor();
+        registerMap.put(0, this.P0);
+        registerMap.put(1, this.P1);
+        registerMap.put(2, this.P2);
+        registerMap.put(3, this.P3);
+        registerMap.put(4, this.P4);
+        registerMap.put(5, this.P5);
+        registerMap.put(6, this.P6);
+        registerMap.put(7, this.P7);
+
+        //
         MnemonicsTable.put("NOP", () -> this.NOP());
         MnemonicsTable.put("JCN", () -> this.JCN());
         MnemonicsTable.put("FIM", () -> {
@@ -58,7 +69,13 @@ public class Emulator {
         MnemonicsTable.put("DAA", () -> this.DAA());
         MnemonicsTable.put("KBP", () -> this.KBP());
         MnemonicsTable.put("DCL", () -> this.DCL());
-        MnemonicsTable.put("LD", () -> this.LD());
+        MnemonicsTable.put("LD", () -> {
+            try {
+                this.LD();
+            } catch (SomethingGotWrong e) {
+                e.printStackTrace();
+            }
+        });
         this.RegisterSetup();
     }
 
@@ -192,7 +209,16 @@ public class Emulator {
 
     }
 
-    public void LD() {
+    public void LD() throws SomethingGotWrong {
+        try {
+            Block instruction = this.Stack[0];
+            System.out.println(this.Accumulator);
+            int registerPair = instruction.getLast4Bits()/2;
+            this.Accumulator = (byte) (registerPair%2==0 ? this.Accumulator+this.registerMap.get(registerPair)[0][0] : this.Accumulator+this.registerMap.get(registerPair)[1][0]);
+            System.out.println(this.Accumulator);
+        } catch (Exception e) {
+            throw e;
+        }
 
     }
 

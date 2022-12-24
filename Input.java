@@ -19,8 +19,7 @@ public class Input {
 
                     Block NewCommandBlock = returnString[2] != null ? createNewBlock(returnString[0], returnString[1], returnString[2])
                             : createNewBlock(returnString[0], returnString[1]);
-                    if (this.verifyCommand(NewCommandBlock))
-                        this.CodeBlocks.add(NewCommandBlock);
+                    this.CodeBlocks.add(NewCommandBlock);
                 }
             }
             return true;

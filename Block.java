@@ -15,11 +15,11 @@ public class Block {
     }
 
     public byte getFirst4Bits(){
-        return Byte.parseByte(First4Bits);
+        return Byte.parseByte(First4Bits,16);
     }
 
     public byte getLast4Bits(){
-        return Byte.parseByte(Second4Bits);
+        return Byte.parseByte(Second4Bits,16);
     }
 
     public boolean hasAssociatedValue(){
