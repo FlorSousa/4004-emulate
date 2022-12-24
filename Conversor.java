@@ -48,6 +48,8 @@ public class Conversor {
                 MnemonicReturn = isJIN ? "JIN" : "FIN"; 
             } else if (mnemonic.equals("MULTIB")) {
                 MnemonicReturn = this.MultiplexFOperationsCode.get((int) InstructionToConvert.getLast4Bits());
+            }else{
+                MnemonicReturn = mnemonic;
             }
             return MnemonicReturn;
         } catch (Exception e) {

@@ -10,14 +10,12 @@ public class Emulator {
     private byte[][] P5 = new byte[1][1];
     private byte[][] P6 = new byte[1][1];
     private byte[][] P7 = new byte[1][1];
-
     private Block[] Stack = new Block[4];
-
+    private Byte[] registerStack = new Byte[8];
     private byte RomPointer = 0;
     private byte Accumulator = 0;
     private boolean carry = false;
     private Map<String, Runnable> MnemonicsTable;
-
     private DataRom ROM;
     private Conversor conversor;
 
@@ -27,7 +25,13 @@ public class Emulator {
         this.conversor = new Conversor();
         MnemonicsTable.put("NOP", () -> this.NOP());
         MnemonicsTable.put("JCN", () -> this.JCN());
-        MnemonicsTable.put("FIM", () -> this.FIM());
+        MnemonicsTable.put("FIM", () -> {
+            try {
+                this.FIM();
+            } catch (SomethingGotWrong e) {
+                e.printStackTrace();
+            }
+        });
         MnemonicsTable.put("FIN", () -> this.FIN());
         MnemonicsTable.put("JIN", () -> this.JIN());
         MnemonicsTable.put("JUN", () -> this.JUN());
@@ -67,7 +71,6 @@ public class Emulator {
     public void RegisterUpdate() throws SomethingGotWrong {
         try {
             for (int i = 0; i < 1; i++) {
-                System.out.println(i);
                 this.Stack[i] = this.Stack[i + 1];
             }
             this.Stack[3] = this.getBlockFromRom();
@@ -85,13 +88,14 @@ public class Emulator {
         Block ActualInstruction = this.Stack[0];
         String Mnemonic = this.TransformOperation(ActualInstruction);
         Runnable RunMethod = this.MnemonicsTable.get(Mnemonic);
-        if(RunMethod != null){
+        if (RunMethod != null) {
             RunMethod.run();
             this.RegisterUpdate();
-        }else{
+
+        } else {
             throw new ImpossibleToRun("Cannot RUN the block");
         }
-        
+
     }
 
     public Block getBlockFromRom() {
@@ -106,8 +110,51 @@ public class Emulator {
         System.out.println("JUMP to ROM address");
     }
 
-    public void FIM() {
+    public void FIM() throws SomethingGotWrong {
+        Block instruction = this.Stack[0];
+        if (instruction.hasAssociatedValue()) {
+            byte v1 = Byte.parseByte(instruction.getAssociatedValue().split("")[0], 16);
+            byte v2 = Byte.parseByte(instruction.getAssociatedValue().split("")[1], 16);
+            int RegisterPair = (instruction.getLast4Bits()) / 2;
+            switch (RegisterPair) {
+                case 0:
+                    this.P0[0][0] = v1;
+                    this.P0[0][1] = v2;
+                    break;
+                case 1:
+                    this.P1[0][0] = v1;
+                    this.P1[0][1] = v2;
+                    break;
+                case 2:
+                    this.P2[0][0] = v1;
+                    this.P2[0][1] = v2;
+                    break;
+                case 3:
+                    this.P3[0][0] = v1;
+                    this.P3[0][1] = v2;
+                    break;
+                case 4:
+                    this.P4[0][0] = v1;
+                    this.P4[0][1] = v2;
+                    break;
+                case 5:
+                    this.P5[0][0] = v1;
+                    this.P5[0][1] = v2;
+                    break;
 
+                case 6:
+                    this.P6[0][0] = v1;
+                    this.P6[0][1] = v2;
+                    break;
+                case 7:
+                    this.P7[0][0] = v1;
+                    this.P7[0][1] = v2;
+                    break;
+            }
+
+        } else {
+            throw new SomethingGotWrong("You are trying use: FIM. But without a value");
+        }
     }
 
     public void FIN() {

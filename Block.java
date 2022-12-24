@@ -26,7 +26,7 @@ public class Block {
         return this.Value != null ? true : false;
     }
 
-    public byte getAssociatedValue(){
-        return Byte.parseByte(this.Value);
+    public String getAssociatedValue(){
+        return this.Value;
     }
 }
