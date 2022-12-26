@@ -210,6 +210,7 @@ public class Emulator {
         }else{
             this.registerMap.get(registerId/2)[1][0] = this.Accumulator;
         }
+        this.Accumulator = 0;
     }
 
     public void BBL() throws SomethingGotWrong {
