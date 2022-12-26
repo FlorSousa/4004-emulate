@@ -53,7 +53,13 @@ public class Emulator {
         MnemonicsTable.put("ADD", () -> this.ADD());
         MnemonicsTable.put("SUB", () -> this.SUB());
         MnemonicsTable.put("XCH", () -> this.XCH());
-        MnemonicsTable.put("BBL", () -> this.BBL());
+        MnemonicsTable.put("BBL", () -> {
+            try {
+                this.BBL();
+            } catch (SomethingGotWrong e1) {
+                e1.printStackTrace();
+            }
+        });
         MnemonicsTable.put("LDM", () -> this.LDM());
         MnemonicsTable.put("CLB", () -> this.CLB());
         MnemonicsTable.put("CLC", () -> this.CLC());
@@ -161,7 +167,13 @@ public class Emulator {
 
     public void INC() {
         System.out.println("Increment register of register");
-
+        Block instruction = this.Stack[0]; 
+        int registerId = instruction.getLast4Bits();
+        if(registerId%2 == 0){
+            this.registerMap.get(registerId/2)[0][0]+=1;
+        }else{
+            this.registerMap.get(registerId/2)[1][0]+=1;
+        }
     }
 
     public void ISZ() {
@@ -170,7 +182,9 @@ public class Emulator {
 
     public void ADD() {
         System.out.println("ADD contents of register to accumulador with a carry");
-
+        Block instruction = this.Stack[0]; 
+        int registerId = instruction.getLast4Bits();
+        this.Accumulator = (byte) (registerId%2==0 ? this.Accumulator+this.registerMap.get(registerId/2)[0][0] : this.Accumulator+this.registerMap.get(registerId)[1][0]);
     }
 
     public void SUB() {
@@ -180,10 +194,8 @@ public class Emulator {
     public void LD() throws SomethingGotWrong {
         try {
             Block instruction = this.Stack[0];
-            System.out.println(this.Accumulator);
             int registerId = instruction.getLast4Bits();
-            this.Accumulator = (byte) (registerId%2==0 ? this.Accumulator+this.registerMap.get(registerId/2)[0][0] : this.Accumulator+this.registerMap.get(registerId)[1][0]);
-            System.out.println(this.Accumulator);
+            this.Accumulator = (byte) (registerId%2==0 ? this.registerMap.get(registerId/2)[0][0] : this.registerMap.get(registerId)[1][0]);
         } catch (Exception e) {
             throw e;
         }
@@ -191,27 +203,44 @@ public class Emulator {
     }
 
     public void XCH() {
-
+        Block instruction = this.Stack[0];
+        int registerId = instruction.getLast4Bits();
+        if(registerId%2 == 0){
+            this.registerMap.get(registerId/2)[0][0] = this.Accumulator;
+        }else{
+            this.registerMap.get(registerId/2)[1][0] = this.Accumulator;
+        }
     }
 
-    public void BBL() {
-
+    public void BBL() throws SomethingGotWrong {
+        try{
+            this.RegisterUpdate();
+            Block instruction = this.Stack[0];
+            byte valueToLoad = instruction.getLast4Bits();
+            this.Accumulator = valueToLoad;
+        }catch(Exception e){
+            throw new SomethingGotWrong("");
+        }
+        
     }
 
     public void LDM() {
-
+        Block instruction = this.Stack[0];
+        byte valueToAdd = instruction.getLast4Bits();
+        this.Accumulator = valueToAdd;
     }
 
     public void CLB() {
-
+        this.Accumulator = 0;
+        this.carry = false;
     }
 
     public void CLC() {
-
+        this.carry = false;
     }
 
     public void IAC() {
-
+        this.Accumulator+=1;
     }
 
     public void CMC() {
@@ -235,7 +264,7 @@ public class Emulator {
     }
 
     public void DAC() {
-
+        this.Accumulator-=1;
     }
 
     public void TCS() {
@@ -243,7 +272,7 @@ public class Emulator {
     }
 
     public void STC() {
-
+        this.carry = true;
     }
 
     public void DAA() {
