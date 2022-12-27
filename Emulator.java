@@ -330,7 +330,12 @@ public class Emulator {
     }
 
     public void RAL() {
-        this.Accumulator = (byte) (this.Accumulator << 1);
+        if((this.Accumulator << 1) > 15){
+            this.Accumulator = 0;
+            System.out.println("Overflow Accumulator");
+        }else{
+            this.Accumulator =  (byte) (this.Accumulator<<1);
+        }
     }
 
     public void RAR() {
@@ -343,9 +348,7 @@ public class Emulator {
     }
 
     public void DAC() {
-        System.out.println(this.Accumulator);
         this.Accumulator = (byte) (this.Accumulator >= 0 ? this.Accumulator-1 : 0);
-        System.out.println(this.Accumulator);
     }
 
     public void TCS() {
