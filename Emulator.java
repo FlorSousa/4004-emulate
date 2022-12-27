@@ -343,7 +343,9 @@ public class Emulator {
     }
 
     public void DAC() {
-        this.Accumulator = this.Accumulator >= 0 ? this.Accumulator-- : 0;
+        System.out.println(this.Accumulator);
+        this.Accumulator = (byte) (this.Accumulator >= 0 ? this.Accumulator-1 : 0);
+        System.out.println(this.Accumulator);
     }
 
     public void TCS() {
