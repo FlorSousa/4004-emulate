@@ -20,9 +20,11 @@ public class Emulator {
     private DataRom ROM;
     private Conversor conversor;
 
+    private boolean running;
+
     Emulator(DataRom ROM) {
         this.ROM = ROM;
-        registerMap =  new HashMap<>();
+        registerMap = new HashMap<>();
         MnemonicsTable = new HashMap<>();
         this.conversor = new Conversor();
         registerMap.put(0, this.P0);
@@ -49,7 +51,17 @@ public class Emulator {
         MnemonicsTable.put("JUN", () -> this.JUN());
         MnemonicsTable.put("JMS", () -> this.JMS());
         MnemonicsTable.put("INC", () -> this.INC());
-        MnemonicsTable.put("ISZ", () -> this.ISZ());
+        MnemonicsTable.put("ISZ", () -> {
+            try {
+                this.ISZ();
+            } catch (SomethingGotWrong e2) {
+                // TODO Auto-generated catch block
+                e2.printStackTrace();
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        });
         MnemonicsTable.put("ADD", () -> this.ADD());
         MnemonicsTable.put("SUB", () -> this.SUB());
         MnemonicsTable.put("XCH", () -> this.XCH());
@@ -63,7 +75,14 @@ public class Emulator {
         MnemonicsTable.put("LDM", () -> this.LDM());
         MnemonicsTable.put("CLB", () -> this.CLB());
         MnemonicsTable.put("CLC", () -> this.CLC());
-        MnemonicsTable.put("IAC", () -> this.IAC());
+        MnemonicsTable.put("IAC", () -> {
+            try {
+                this.IAC();
+            } catch (SomethingGotWrong e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        });
         MnemonicsTable.put("CMC", () -> this.CMC());
         MnemonicsTable.put("CMA", () -> this.CMA());
         MnemonicsTable.put("RAL", () -> this.RAL());
@@ -83,6 +102,7 @@ public class Emulator {
             }
         });
         this.RegisterSetup();
+        this.running = true;
     }
 
     public void RegisterSetup() {
@@ -109,25 +129,39 @@ public class Emulator {
     }
 
     public void ExecuteOperation() throws Exception {
-        Block ActualInstruction = this.Stack[0];
-        String Mnemonic = this.TransformOperation(ActualInstruction);
-        Runnable RunMethod = this.MnemonicsTable.get(Mnemonic);
-        if (RunMethod != null) {
-            RunMethod.run();
-            this.RegisterUpdate();
+        while (running) {
+            Block ActualInstruction = this.Stack[0];
+            String Mnemonic = this.TransformOperation(ActualInstruction);
+            Runnable RunMethod = this.MnemonicsTable.get(Mnemonic);
+            if (RunMethod != null) {
+                RunMethod.run();
+                this.RegisterUpdate();
 
-        } else {
-            throw new ImpossibleToRun("Cannot RUN the block");
+            } else {
+                throw new ImpossibleToRun("Cannot RUN the block");
+            }
         }
 
     }
 
-    private Block getBlockFromRom(int pointer){
+    public void ExecuteOperation(Block instruction) throws Exception {
+        String Mnemonic = this.TransformOperation(instruction);
+        Runnable RunMethod = this.MnemonicsTable.get(Mnemonic);
+        if (RunMethod != null) {
+            RunMethod.run();
+            this.RegisterUpdate();
+        } else {
+            throw new ImpossibleToRun("Cannot RUN the block");
+        }
+    }
+
+    private Block getBlockFromRom(int pointer) {
         return this.ROM.ReturnBlock(pointer);
     }
 
     public void NOP() {
         System.out.println("No Operation - NOP");
+        this.running = false;
     }
 
     public void JCN() {
@@ -150,35 +184,35 @@ public class Emulator {
     }
 
     public void FIN() {
-        Block instruction = this.Stack[0]; 
+        Block instruction = this.Stack[0];
         Block firstBlock = this.getBlockFromRom(0);
         byte FirstWord = firstBlock.getFirst4Bits();
         byte SecondWord = firstBlock.getLast4Bits();
-        int key = instruction.getLast4Bits()/2;
+        int key = instruction.getLast4Bits() / 2;
         byte[][] pair = this.registerMap.get(key);
         pair[0][0] = FirstWord;
         pair[1][0] = SecondWord;
     }
 
     public void JIN() {
-        Block instruction = this.Stack[0]; 
+        Block instruction = this.Stack[0];
         byte SecondWord = instruction.getLast4Bits();
-        int key = SecondWord/2;
+        int key = SecondWord / 2;
         byte[][] pair = this.registerMap.get(key);
-        int pointer = Integer.parseInt((String.valueOf(pair[0][0]) + String.valueOf(pair[1][0])),16);
+        int pointer = Integer.parseInt((String.valueOf(pair[0][0]) + String.valueOf(pair[1][0])), 16);
         this.Stack[0] = this.getBlockFromRom(pointer);
     }
 
     public void JUN() {
-        Block instruction = this.Stack[0]; 
-        int toPoint = Integer.parseInt(instruction.getLast4Bits() + instruction.getAssociatedValue(),16);
+        Block instruction = this.Stack[0];
+        int toPoint = Integer.parseInt(instruction.getLast4Bits() + instruction.getAssociatedValue(), 16);
         this.RomPointer = toPoint;
         this.Stack[0] = getBlockFromRom(this.RomPointer);
     }
 
     public void JMS() {
-        Block instruction = this.Stack[0]; 
-        int toPoint = Integer.parseInt(instruction.getLast4Bits() + instruction.getAssociatedValue(),16);
+        Block instruction = this.Stack[0];
+        int toPoint = Integer.parseInt(instruction.getLast4Bits() + instruction.getAssociatedValue(), 16);
         this.Stack[1] = this.Stack[0];
         this.RomPointer = toPoint;
         this.Stack[0] = getBlockFromRom(this.RomPointer);
@@ -186,40 +220,61 @@ public class Emulator {
 
     public void INC() {
         System.out.println("Increment register of register");
-        Block instruction = this.Stack[0]; 
+        Block instruction = this.Stack[0];
         int registerId = instruction.getLast4Bits();
-        if(registerId%2 == 0){
-            this.registerMap.get(registerId/2)[0][0]+=1;
-        }else{
-            this.registerMap.get(registerId/2)[1][0]+=1;
+        if (registerId % 2 == 0) {
+            this.registerMap.get(registerId / 2)[0][0] += 1;
+        } else {
+            this.registerMap.get(registerId / 2)[1][0] += 1;
         }
     }
 
-    public void ISZ() {
+    public void ISZ() throws Exception {
+        System.out.println("ISZ");
+        Block instruction = this.Stack[0];
+        if (instruction.hasAssociatedValue()) {
+            Block repeatInstruction = getBlockFromRom(Integer.parseInt(instruction.getAssociatedValue(), 16));
+            byte registerId = instruction.getLast4Bits();
+            int key = registerId / 2;
+            byte[][] pair = this.registerMap.get(key);
+            byte value = registerId % 2 == 0 ? pair[0][0] : pair[1][0];
+            while (value < 15) {
+                value++;
+                if (instruction.getFirst4Bits() != repeatInstruction.getFirst4Bits()) {
+                    this.ExecuteOperation(repeatInstruction);
+                } else {
+                    throw new SomethingGotWrong("The program stops because you made a previsible infinite loop");
+                }
+            }
+        } else {
+            throw new SomethingGotWrong("You are trying use ISZ but without a associated value to loop");
+        }
 
     }
 
     public void ADD() {
         System.out.println("ADD contents of register to accumulador with a carry");
-        Block instruction = this.Stack[0]; 
+        Block instruction = this.Stack[0];
         int registerId = instruction.getLast4Bits();
-        this.Accumulator = (byte) (registerId%2==0 ? this.Accumulator+this.registerMap.get(registerId/2)[0][0] : this.Accumulator+this.registerMap.get(registerId)[1][0]);
+        this.Accumulator = (byte) (registerId % 2 == 0 ? this.Accumulator + this.registerMap.get(registerId / 2)[0][0]
+                : this.Accumulator + this.registerMap.get(registerId)[1][0]);
     }
 
     public void SUB() {
-        Block instruction = this.Stack[0]; 
+        Block instruction = this.Stack[0];
         int SecondWord = instruction.getLast4Bits();
-        int key = SecondWord/2;
+        int key = SecondWord / 2;
         byte[][] pair = this.registerMap.get(key);
-        int value = Integer.parseInt((String.valueOf(pair[0][0]) + String.valueOf(pair[1][0])),16);
-        this.Accumulator-= value;
+        int value = Integer.parseInt((String.valueOf(pair[0][0]) + String.valueOf(pair[1][0])), 16);
+        this.Accumulator -= value;
     }
 
     public void LD() throws SomethingGotWrong {
         try {
             Block instruction = this.Stack[0];
             int registerId = instruction.getLast4Bits();
-            this.Accumulator = (byte) (registerId%2==0 ? this.registerMap.get(registerId/2)[0][0] : this.registerMap.get(registerId)[1][0]);
+            this.Accumulator = (byte) (registerId % 2 == 0 ? this.registerMap.get(registerId / 2)[0][0]
+                    : this.registerMap.get(registerId)[1][0]);
         } catch (Exception e) {
             throw e;
         }
@@ -229,24 +284,24 @@ public class Emulator {
     public void XCH() {
         Block instruction = this.Stack[0];
         int registerId = instruction.getLast4Bits();
-        if(registerId%2 == 0){
-            this.registerMap.get(registerId/2)[0][0] = this.Accumulator;
-        }else{
-            this.registerMap.get(registerId/2)[1][0] = this.Accumulator;
+        if (registerId % 2 == 0) {
+            this.registerMap.get(registerId / 2)[0][0] = this.Accumulator;
+        } else {
+            this.registerMap.get(registerId / 2)[1][0] = this.Accumulator;
         }
         this.Accumulator = 0;
     }
 
     public void BBL() throws SomethingGotWrong {
-        try{
+        try {
             this.RegisterUpdate();
             Block instruction = this.Stack[0];
             byte valueToLoad = instruction.getLast4Bits();
             this.Accumulator = valueToLoad;
-        }catch(Exception e){
+        } catch (Exception e) {
             throw new SomethingGotWrong("");
         }
-        
+
     }
 
     public void LDM() {
@@ -264,8 +319,13 @@ public class Emulator {
         this.carry = false;
     }
 
-    public void IAC() {
-        this.Accumulator+=1;
+    public void IAC() throws SomethingGotWrong {
+        System.out.println("iac");
+        if (this.Accumulator < 15) {
+            this.Accumulator++;
+        } else {
+            this.running = false;
+        }
     }
 
     public void CMC() {
@@ -277,24 +337,24 @@ public class Emulator {
     }
 
     public void RAL() {
-
+        this.Accumulator = (byte) (this.Accumulator << 1);
     }
 
     public void RAR() {
-
+        this.Accumulator = (byte) (this.Accumulator >> 1);
     }
 
     public void TCC() {
-
+        this.Accumulator = (byte) (this.carry ? 1 : 0);
+        this.carry = false;
     }
 
     public void DAC() {
-        this.Accumulator= this.Accumulator >=0 ? this.Accumulator-- : 0;
+        this.Accumulator = this.Accumulator >= 0 ? this.Accumulator-- : 0;
     }
 
     public void TCS() {
-        this.Accumulator = (byte) (this.carry ? 1 : 0);
-        this.carry = false;
+
     }
 
     public void STC() {
@@ -313,3 +373,14 @@ public class Emulator {
 
     }
 }
+
+/*
+ * TODO
+ * 1 - DCL
+ * 2 - KBP
+ * 3 - DAA
+ * 4 - TSC
+ * 5 - CMC
+ * 6 - CMA
+ * 7 - ISZ
+ */

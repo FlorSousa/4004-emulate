@@ -3,7 +3,7 @@ import java.util.List;
 public class main {
     public static void main(String[] args) throws Exception{
         Input entrada = new Input();
-        System.out.println("Insert the object code in this format : 00, 22, etc");
+        System.out.println("Insert the object code in this format : 00, 22 A2, etc. And always finish using 00 to No Operation Code");
         System.out.println("Object Code:");
         if(entrada.setCommand()){
             List<Block> CommandList = entrada.getCodeBlocks();
