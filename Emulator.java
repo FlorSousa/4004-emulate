@@ -120,18 +120,14 @@ public class Emulator {
     }
 
     public String TransformOperation(Block InstructionToConvert) throws Exception {
-        /*
-        if(InstructionToConvert == null){
-            return "NOP";
-        }else{
-            return this.conversor.ConvertOperation(InstructionToConvert);
-        }*/
         return this.conversor.ConvertOperation(InstructionToConvert);
     }
 
     public void ExecuteOperation() throws Exception {
         while (running) {
             Block ActualInstruction = this.Stack[0];
+            System.out.println(ActualInstruction + "129");
+            System.out.println(this.RomPointer);
             String Mnemonic = this.TransformOperation(ActualInstruction);
             Runnable RunMethod = this.MnemonicsTable.get(Mnemonic);
             if (RunMethod != null) {
@@ -295,7 +291,6 @@ public class Emulator {
 
     public void BBL() throws SomethingGotWrong {
         try {
-            this.RegisterUpdate();
             Block instruction = this.Stack[0];
             byte valueToLoad = instruction.getLast4Bits();
             this.Accumulator = valueToLoad;
