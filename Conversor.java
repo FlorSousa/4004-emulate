@@ -53,7 +53,7 @@ public class Conversor {
             }
             return MnemonicReturn;
         } catch (Exception e) {
-            throw new ImpossibleToConvert("Cannot convert this block:"+e);
+            throw new ImpossibleToConvert("Cannot convert this block: "+e);
         }
     }
 

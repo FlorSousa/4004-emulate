@@ -106,18 +106,13 @@ public class Emulator {
     }
 
     public void RegisterSetup() {
-        for (int i = 0; i < this.Stack.length; i++) {
-            this.Stack[i] = this.getBlockFromRom(this.RomPointer);
-            this.RomPointer++;
-        }
+        this.Stack[0] = this.getBlockFromRom(this.RomPointer);
+        this.RomPointer++;
     }
 
     public void RegisterUpdate() throws SomethingGotWrong {
         try {
-            for (int i = 0; i < 1; i++) {
-                this.Stack[i] = this.Stack[i + 1];
-            }
-            this.Stack[3] = this.getBlockFromRom(this.RomPointer);
+            this.Stack[0] = this.getBlockFromRom(this.RomPointer);
             this.RomPointer++;
         } catch (Exception e) {
             throw new SomethingGotWrong("Something got wrong during register update");
@@ -125,6 +120,12 @@ public class Emulator {
     }
 
     public String TransformOperation(Block InstructionToConvert) throws Exception {
+        /*
+        if(InstructionToConvert == null){
+            return "NOP";
+        }else{
+            return this.conversor.ConvertOperation(InstructionToConvert);
+        }*/
         return this.conversor.ConvertOperation(InstructionToConvert);
     }
 
