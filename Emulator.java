@@ -126,8 +126,6 @@ public class Emulator {
     public void ExecuteOperation() throws Exception {
         while (running) {
             Block ActualInstruction = this.Stack[0];
-            System.out.println(ActualInstruction + "129");
-            System.out.println(this.RomPointer);
             String Mnemonic = this.TransformOperation(ActualInstruction);
             Runnable RunMethod = this.MnemonicsTable.get(Mnemonic);
             if (RunMethod != null) {
@@ -157,7 +155,7 @@ public class Emulator {
     }
 
     public void NOP() {
-        System.out.println("No Operation - NOP");
+        System.out.println("Program will be finished - NOP has been called");
         this.running = false;
     }
 
@@ -316,7 +314,6 @@ public class Emulator {
     }
 
     public void IAC() throws SomethingGotWrong {
-        System.out.println("iac");
         if (this.Accumulator < 15) {
             this.Accumulator++;
         } else {

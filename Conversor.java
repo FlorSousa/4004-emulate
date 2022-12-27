@@ -18,8 +18,9 @@ public class Conversor {
         this.OperationsMap.put(8, "ADD");
         this.OperationsMap.put(9, "SUB");
         this.OperationsMap.put(10, "LD");
-        this.OperationsMap.put(12, "XCH");
-        this.OperationsMap.put(13, "BBL");
+        this.OperationsMap.put(11, "XCH");
+        this.OperationsMap.put(12, "BBL");
+        this.OperationsMap.put(13, "LDM");
         this.OperationsMap.put(14, "NOP");
         this.OperationsMap.put(15, "MULTIB");
         //
