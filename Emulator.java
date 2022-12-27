@@ -12,7 +12,7 @@ public class Emulator {
     private byte[][] P7 = new byte[2][1];
 
     private Block[] Stack = new Block[4];
-    private byte RomPointer = 0;
+    private int RomPointer = 0;
     private byte Accumulator = 0;
     private boolean carry = false;
     private Map<String, Runnable> MnemonicsTable;
@@ -87,7 +87,7 @@ public class Emulator {
 
     public void RegisterSetup() {
         for (int i = 0; i < this.Stack.length; i++) {
-            this.Stack[i] = this.getBlockFromRom();
+            this.Stack[i] = this.getBlockFromRom(this.RomPointer);
             this.RomPointer++;
         }
     }
@@ -97,7 +97,7 @@ public class Emulator {
             for (int i = 0; i < 1; i++) {
                 this.Stack[i] = this.Stack[i + 1];
             }
-            this.Stack[3] = this.getBlockFromRom();
+            this.Stack[3] = this.getBlockFromRom(this.RomPointer);
             this.RomPointer++;
         } catch (Exception e) {
             throw new SomethingGotWrong("Something got wrong during register update");
@@ -122,8 +122,8 @@ public class Emulator {
 
     }
 
-    public Block getBlockFromRom() {
-        return this.ROM.ReturnBlock(this.RomPointer);
+    private Block getBlockFromRom(int pointer){
+        return this.ROM.ReturnBlock(pointer);
     }
 
     public void NOP() {
@@ -150,19 +150,38 @@ public class Emulator {
     }
 
     public void FIN() {
-
+        Block instruction = this.Stack[0]; 
+        Block firstBlock = this.getBlockFromRom(0);
+        byte FirstWord = firstBlock.getFirst4Bits();
+        byte SecondWord = firstBlock.getLast4Bits();
+        int key = instruction.getLast4Bits()/2;
+        byte[][] pair = this.registerMap.get(key);
+        pair[0][0] = FirstWord;
+        pair[1][0] = SecondWord;
     }
 
     public void JIN() {
-
+        Block instruction = this.Stack[0]; 
+        byte SecondWord = instruction.getLast4Bits();
+        int key = SecondWord/2;
+        byte[][] pair = this.registerMap.get(key);
+        int pointer = Integer.parseInt((String.valueOf(pair[0][0]) + String.valueOf(pair[1][0])),16);
+        this.Stack[0] = this.getBlockFromRom(pointer);
     }
 
     public void JUN() {
-
+        Block instruction = this.Stack[0]; 
+        int toPoint = Integer.parseInt(instruction.getLast4Bits() + instruction.getAssociatedValue(),16);
+        this.RomPointer = toPoint;
+        this.Stack[0] = getBlockFromRom(this.RomPointer);
     }
 
     public void JMS() {
-
+        Block instruction = this.Stack[0]; 
+        int toPoint = Integer.parseInt(instruction.getLast4Bits() + instruction.getAssociatedValue(),16);
+        this.Stack[1] = this.Stack[0];
+        this.RomPointer = toPoint;
+        this.Stack[0] = getBlockFromRom(this.RomPointer);
     }
 
     public void INC() {
@@ -188,7 +207,12 @@ public class Emulator {
     }
 
     public void SUB() {
-
+        Block instruction = this.Stack[0]; 
+        int SecondWord = instruction.getLast4Bits();
+        int key = SecondWord/2;
+        byte[][] pair = this.registerMap.get(key);
+        int value = Integer.parseInt((String.valueOf(pair[0][0]) + String.valueOf(pair[1][0])),16);
+        this.Accumulator-= value;
     }
 
     public void LD() throws SomethingGotWrong {
@@ -265,11 +289,12 @@ public class Emulator {
     }
 
     public void DAC() {
-        this.Accumulator-=1;
+        this.Accumulator= this.Accumulator >=0 ? this.Accumulator-- : 0;
     }
 
     public void TCS() {
-
+        this.Accumulator = (byte) (this.carry ? 1 : 0);
+        this.carry = false;
     }
 
     public void STC() {

@@ -6,7 +6,7 @@ public class DataRom {
         this.ROM = ROM;
     }
 
-    public Block ReturnBlock(byte pointer){
+    public Block ReturnBlock(int pointer){
         return pointer <= this.ROM.size()-1 ? this.ROM.get(pointer) : null;
     }
     
