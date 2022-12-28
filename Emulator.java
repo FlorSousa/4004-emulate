@@ -268,8 +268,9 @@ public class Emulator {
         try {
             Block instruction = this.Stack[0];
             int registerId = instruction.getLast4Bits();
-            this.Accumulator = (byte) (registerId % 2 == 0 ? this.registerMap.get(registerId / 2)[0][0]
-                    : this.registerMap.get(registerId)[1][0]);
+            byte[][] pair = this.registerMap.get(registerId/2);
+            int value = registerId%2 == 0 ? pair[0][0] : pair[1][0];
+            this.Accumulator+=value;
         } catch (Exception e) {
             throw e;
         }
@@ -330,12 +331,14 @@ public class Emulator {
     }
 
     public void RAL() {
+        System.out.println(this.Accumulator);
         if ((this.Accumulator << 1) > 15) {
             this.Accumulator = 0;
             System.out.println("Overflow Accumulator");
         } else {
             this.Accumulator = (byte) (this.Accumulator << 1);
         }
+        System.out.println(this.Accumulator);
     }
 
     public void RAR() {
