@@ -172,7 +172,6 @@ public class Emulator {
             byte[][] registerPair = this.registerMap.get(registerId);
             registerPair[0][0] = v1;
             registerPair[1][0] = v2;
-
         } else {
             throw new SomethingGotWrong("You are trying use: FIM. But without a value");
         }
@@ -250,9 +249,10 @@ public class Emulator {
     public void ADD() {
         System.out.println("ADD contents of register to accumulador with a carry");
         Block instruction = this.Stack[0];
-        int registerId = instruction.getLast4Bits();
-        this.Accumulator = (byte) (registerId % 2 == 0 ? this.Accumulator + this.registerMap.get(registerId / 2)[0][0]
-                : this.Accumulator + this.registerMap.get(registerId)[1][0]);
+        byte SecondWord = instruction.getLast4Bits();
+        int key = SecondWord/2;
+        byte[][] pair = this.registerMap.get(key);
+        this.Accumulator= (byte) (SecondWord%2 == 0 ? this.Accumulator+pair[0][0] : this.Accumulator+pair[1][0]);
     }
 
     public void SUB() {
@@ -260,8 +260,8 @@ public class Emulator {
         int SecondWord = instruction.getLast4Bits();
         int key = SecondWord / 2;
         byte[][] pair = this.registerMap.get(key);
-        int value = Integer.parseInt((String.valueOf(pair[0][0]) + String.valueOf(pair[1][0])), 16);
-        this.Accumulator -= value;
+        int value = SecondWord%2 == 0 ? pair[0][0] : pair[1][0];
+        this.Accumulator = (byte) ((this.Accumulator - value) > 0 ?  this.Accumulator - value : 0);
     }
 
     public void LD() throws SomethingGotWrong {
@@ -330,11 +330,11 @@ public class Emulator {
     }
 
     public void RAL() {
-        if((this.Accumulator << 1) > 15){
+        if ((this.Accumulator << 1) > 15) {
             this.Accumulator = 0;
             System.out.println("Overflow Accumulator");
-        }else{
-            this.Accumulator =  (byte) (this.Accumulator<<1);
+        } else {
+            this.Accumulator = (byte) (this.Accumulator << 1);
         }
     }
 
@@ -348,7 +348,7 @@ public class Emulator {
     }
 
     public void DAC() {
-        this.Accumulator = (byte) (this.Accumulator >= 0 ? this.Accumulator-1 : 0);
+        this.Accumulator = (byte) (this.Accumulator >= 0 ? this.Accumulator - 1 : 0);
     }
 
     public void TCS() {
