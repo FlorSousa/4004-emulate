@@ -399,7 +399,7 @@ public class Emulator {
     }
 
     public void KBP() {
-
+        if(this.Accumulator >= 5 || this.Accumulator==3) this.Accumulator = 15;
     }
 
     public void DCL() {
@@ -410,5 +410,5 @@ public class Emulator {
 /*
  * TODO
  * 1 - DCL
- * 2 - KBP
+ * 2 - KBP ???
  */
