@@ -50,15 +50,19 @@ public class Emulator {
         MnemonicsTable.put("JIN", () -> this.JIN());
         MnemonicsTable.put("JUN", () -> this.JUN());
         MnemonicsTable.put("JMS", () -> this.JMS());
-        MnemonicsTable.put("INC", () -> this.INC());
+        MnemonicsTable.put("INC", () -> {
+            try {
+                this.INC();
+            } catch (SomethingGotWrong e3) {
+                e3.printStackTrace();
+            }
+        });
         MnemonicsTable.put("ISZ", () -> {
             try {
                 this.ISZ();
             } catch (SomethingGotWrong e2) {
-                // TODO Auto-generated catch block
                 e2.printStackTrace();
             } catch (Exception e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         });
@@ -79,7 +83,6 @@ public class Emulator {
             try {
                 this.IAC();
             } catch (SomethingGotWrong e1) {
-                // TODO Auto-generated catch block
                 e1.printStackTrace();
             }
         });
@@ -89,7 +92,13 @@ public class Emulator {
         MnemonicsTable.put("RAR", () -> this.RAR());
         MnemonicsTable.put("TCC", () -> this.TCC());
         MnemonicsTable.put("DAC", () -> this.DAC());
-        MnemonicsTable.put("TCS", () -> this.TCS());
+        MnemonicsTable.put("TCS", () -> {
+            try {
+                this.TCS();
+            } catch (SomethingGotWrong e1) {
+                e1.printStackTrace();
+            }
+        });
         MnemonicsTable.put("STC", () -> this.STC());
         MnemonicsTable.put("DAA", () -> this.DAA());
         MnemonicsTable.put("KBP", () -> this.KBP());
@@ -121,6 +130,10 @@ public class Emulator {
 
     public String TransformOperation(Block InstructionToConvert) throws Exception {
         return this.conversor.ConvertOperation(InstructionToConvert);
+    }
+
+    private byte FourBitMask(byte num){
+        return (byte) (num&0b00001111);
     }
 
     public void ExecuteOperation() throws Exception {
@@ -207,19 +220,27 @@ public class Emulator {
     public void JMS() {
         Block instruction = this.Stack[0];
         int toPoint = Integer.parseInt(instruction.getLast4Bits() + instruction.getAssociatedValue(), 16);
+        this.Stack[3] = this.Stack[2];
+        this.Stack[2] = this.Stack[1];
         this.Stack[1] = this.Stack[0];
+        //I will fix this . . . someday, i think
         this.RomPointer = toPoint;
         this.Stack[0] = getBlockFromRom(this.RomPointer);
     }
 
-    public void INC() {
+    public void INC() throws SomethingGotWrong {
         System.out.println("Increment register of register");
         Block instruction = this.Stack[0];
         int registerId = instruction.getLast4Bits();
+        byte x;
         if (registerId % 2 == 0) {
-            this.registerMap.get(registerId / 2)[0][0] += 1;
+            x = this.registerMap.get(registerId / 2)[0][0];
+            if(x<=15) this.registerMap.get(registerId / 2)[0][0] += 1;
+            else throw new SomethingGotWrong("Overflow");
         } else {
-            this.registerMap.get(registerId / 2)[1][0] += 1;
+            x = this.registerMap.get(registerId / 2)[1][0];
+            if(x<15) this.registerMap.get(registerId / 2)[1][0] += 1;
+            else throw new SomethingGotWrong("Overflow");
         }
     }
 
@@ -262,6 +283,8 @@ public class Emulator {
         byte[][] pair = this.registerMap.get(key);
         int value = SecondWord%2 == 0 ? pair[0][0] : pair[1][0];
         this.Accumulator = (byte) ((this.Accumulator - value) > 0 ?  this.Accumulator - value : 0);
+        //I have no idea to make the program know if operation has used borrow, so for default always the SUB will set carry
+        this.carry = true;
     }
 
     public void LD() throws SomethingGotWrong {
@@ -291,7 +314,11 @@ public class Emulator {
     public void BBL() throws SomethingGotWrong {
         try {
             Block instruction = this.Stack[0];
-            byte valueToLoad = instruction.getLast4Bits();
+            for (int i = 0; i < 2; i++) {
+                this.Stack[i] = this.Stack[i+1];
+            }
+            this.Stack[3] = null;
+            byte valueToLoad = this.FourBitMask(instruction.getLast4Bits());
             this.Accumulator = valueToLoad;
         } catch (Exception e) {
             throw new SomethingGotWrong("");
@@ -301,7 +328,7 @@ public class Emulator {
 
     public void LDM() {
         Block instruction = this.Stack[0];
-        byte valueToAdd = instruction.getLast4Bits();
+        byte valueToAdd = this.FourBitMask(instruction.getLast4Bits());
         this.Accumulator = valueToAdd;
     }
 
@@ -323,22 +350,22 @@ public class Emulator {
     }
 
     public void CMC() {
-
+        this.carry = !this.carry;
     }
 
     public void CMA() {
-
+        this.Accumulator = (byte) (~this.Accumulator&0b00001111);
     }
 
     public void RAL() {
-        System.out.println(this.Accumulator);
         if ((this.Accumulator << 1) > 15) {
-            this.Accumulator = 0;
+            byte n = (byte) (this.Accumulator<<1);
+            n = this.FourBitMask(n);
+            this.Accumulator = n;
             System.out.println("Overflow Accumulator");
         } else {
             this.Accumulator = (byte) (this.Accumulator << 1);
         }
-        System.out.println(this.Accumulator);
     }
 
     public void RAR() {
@@ -354,8 +381,9 @@ public class Emulator {
         this.Accumulator = (byte) (this.Accumulator >= 0 ? this.Accumulator - 1 : 0);
     }
 
-    public void TCS() {
-
+    public void TCS() throws SomethingGotWrong {
+        this.Accumulator = (byte) (this.carry ? 10:9);
+        this.carry = false;
     }
 
     public void STC() {
@@ -363,7 +391,11 @@ public class Emulator {
     }
 
     public void DAA() {
-
+        if(this.carry || this.Accumulator>9){
+            byte newValue = this.FourBitMask((byte) (this.Accumulator+6));
+            this.carry = newValue < this.Accumulator+6 ? true:false;
+            this.Accumulator = newValue;
+        }
     }
 
     public void KBP() {
@@ -379,9 +411,4 @@ public class Emulator {
  * TODO
  * 1 - DCL
  * 2 - KBP
- * 3 - DAA
- * 4 - TSC
- * 5 - CMC
- * 6 - CMA
- * 7 - ISZ
  */
