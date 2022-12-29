@@ -149,6 +149,22 @@ public class Emulator {
                 throw new ImpossibleToRun("Cannot RUN the block");
             }
         }
+        System.out.println("         FINAL RESULT             ");
+        System.out.println("------------------------------- \n");
+        System.out.println("ROM BLOCKS: "+this.ROM.listHex() +"\n");
+        System.out.println("Accumulator: " + this.Accumulator);
+        System.out.println("Carry: " + this.carry);
+        System.out.println("Pointer of Rom: "+ this.RomPointer);
+
+        System.out.println("R0R1: "+this.registerMap.get(0)[0][0]+" "+this.registerMap.get(0)[1][0]);
+        System.out.println("R2R3: "+this.registerMap.get(1)[0][0]+" "+this.registerMap.get(1)[1][0]);
+        System.out.println("R4R5: "+this.registerMap.get(2)[0][0]+" "+this.registerMap.get(2)[1][0]);
+        System.out.println("R6R7: "+this.registerMap.get(3)[0][0]+" "+this.registerMap.get(3)[1][0]);
+        System.out.println("R8R9: "+this.registerMap.get(4)[0][0]+" "+this.registerMap.get(4)[1][0]);
+        System.out.println("RARB: "+this.registerMap.get(5)[0][0]+" "+this.registerMap.get(5)[1][0]);
+        System.out.println("RCRD: "+this.registerMap.get(6)[0][0]+" "+this.registerMap.get(6)[1][0]);
+        System.out.println("RERF: "+this.registerMap.get(7)[0][0]+" "+this.registerMap.get(7)[1][0]+"\n");
+        System.out.println("------------------------------- \n");
 
     }
 
@@ -168,7 +184,6 @@ public class Emulator {
     }
 
     public void NOP() {
-        System.out.println("Program will be finished - NOP has been called");
         this.running = false;
     }
 

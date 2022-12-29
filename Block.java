@@ -29,4 +29,12 @@ public class Block {
     public String getAssociatedValue(){
         return this.Value;
     }
+
+    public String returnHex(){
+        if(hasAssociatedValue()){
+            return this.First4Bits + this.Second4Bits +this.Value;
+        }else{
+            return this.First4Bits + this.Second4Bits;
+        }
+    }
 }

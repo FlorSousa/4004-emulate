@@ -9,5 +9,13 @@ public class DataRom {
     public Block ReturnBlock(int pointer){
         return pointer <= this.ROM.size()-1 ? this.ROM.get(pointer) : null;
     }
+
+    public String listHex(){
+        String r = "";
+        for(Block b:ROM){
+            r+=b.returnHex();
+        }
+        return r;
+    }
     
 }
