@@ -1,5 +1,9 @@
+package src;
 import java.util.HashMap;
 import java.util.Map;
+
+import Exceptions.ImpossibleToRun;
+import Exceptions.SomethingGotWrong;
 
 public class Emulator {
     private byte[][] P0 = new byte[2][1];
@@ -154,7 +158,7 @@ public class Emulator {
         System.out.println("ROM BLOCKS: "+this.ROM.listHex() +"\n");
         System.out.println("Accumulator: " + this.Accumulator);
         System.out.println("Carry: " + this.carry);
-        System.out.println("Pointer of Rom: "+ this.RomPointer);
+        System.out.println("PC: "+ this.RomPointer);
 
         System.out.println("R0R1: "+this.registerMap.get(0)[0][0]+" "+this.registerMap.get(0)[1][0]);
         System.out.println("R2R3: "+this.registerMap.get(1)[0][0]+" "+this.registerMap.get(1)[1][0]);

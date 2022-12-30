@@ -1,6 +1,7 @@
+package Exceptions;
 
 public class ImpossibleToRun extends Exception {
-    ImpossibleToRun(String msg){
+    public ImpossibleToRun(String msg){
         System.out.println(msg);
     }
 }

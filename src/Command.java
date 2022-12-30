@@ -1,3 +1,4 @@
+package src;
 public class Command {
     private String FirstWord;
     private String SecondWord;

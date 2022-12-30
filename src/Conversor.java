@@ -1,5 +1,8 @@
+package src;
 import java.util.HashMap;
 import java.util.Map;
+
+import Exceptions.ImpossibleToConvert;
 
 public class Conversor {
     Map<Integer, String> OperationsMap;

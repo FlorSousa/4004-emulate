@@ -1,6 +1,9 @@
+package src;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import Exceptions.ImpossibleToConvert;
 
 public class Input {
     Scanner scanner;

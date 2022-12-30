@@ -1,4 +1,7 @@
+package src;
 import java.util.List;
+
+import Exceptions.SomethingGotWrong;
 
 public class main {
     public static void main(String[] args) throws Exception{
