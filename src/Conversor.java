@@ -2,7 +2,7 @@ package src;
 import java.util.HashMap;
 import java.util.Map;
 
-import Exceptions.ImpossibleToConvert;
+import src.Exceptions.ImpossibleToConvert;
 
 public class Conversor {
     Map<Integer, String> OperationsMap;

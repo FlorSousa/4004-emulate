@@ -1,4 +1,4 @@
-package Exceptions;
+package src.Exceptions;
 
 public class ImpossibleToRun extends Exception {
     public ImpossibleToRun(String msg){

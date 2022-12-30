@@ -1,5 +1,5 @@
 package src;
-import Exceptions.ImpossibleToConvert;
+import src.Exceptions.ImpossibleToConvert;
 
 public class Block {
     String First4Bits;

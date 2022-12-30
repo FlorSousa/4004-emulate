@@ -2,8 +2,8 @@ package src;
 import java.util.HashMap;
 import java.util.Map;
 
-import Exceptions.ImpossibleToRun;
-import Exceptions.SomethingGotWrong;
+import src.Exceptions.ImpossibleToRun;
+import src.Exceptions.SomethingGotWrong;
 
 public class Emulator {
     private byte[][] P0 = new byte[2][1];

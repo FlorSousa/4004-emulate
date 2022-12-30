@@ -1,9 +1,9 @@
 package src;
 import java.util.List;
 
-import Exceptions.SomethingGotWrong;
+import src.Exceptions.SomethingGotWrong;
 
-public class main {
+public class Runner {
     public static void main(String[] args) throws Exception{
         Input entrada = new Input();
         System.out.println("Insert the object code in this format : 00, 22 A2, etc. And always finish using 00 to No Operation Code");
